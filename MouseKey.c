@@ -3,7 +3,7 @@
  * henkan => middle click
  *
  * ## build command ##
- * > cl.exe /O2 /GS- /source-charset:utf-8 vi-keys.c kernel32.lib user32.lib /link /NODEFAULTLIB /STACK:4096
+ * > cl.exe /O2 /GS- /source-charset:utf-8 MouseKey.c kernel32.lib user32.lib /link /NODEFAULTLIB /STACK:4096
  *
  * ## add startup this app ##
  * Location of the User Startup folder in Windows 10
@@ -14,10 +14,6 @@
 
 #include <Windows.h>
 
-#define MOUSE_MOVE_DX      8
-#define MOUSE_MOVE_DY      8
-#define MOUSE_MOVE_ACCEL   1
-#define MOUSE_MOVE_MAX    16
 #define MKEY_NONE       0x00
 #define MKEY_LSHIFT     0x01
 #define MKEY_RSHIFT     0x02
@@ -65,7 +61,7 @@ void WinMainCRTStartup() {
     MSG  msg;
     UINT i;
 
-    mutex = CreateMutex(NULL, FALSE, "VI_KEYS");
+    mutex = CreateMutex(NULL, FALSE, "MOUSE_KEY");
     if (mutex == NULL || GetLastError() == ERROR_ALREADY_EXISTS) {
         ExitProcess(1);
     }
@@ -87,7 +83,7 @@ void WinMainCRTStartup() {
     wc.cbSize = sizeof(WNDCLASSEX);
     wc.lpfnWndProc = (WNDPROC)WndProc;
     wc.hInstance = hInstance;
-    wc.lpszClassName = "VI_KEYS";
+    wc.lpszClassName = "MOUSE_KEY";
 
     if (RegisterClassEx(&wc)) {
         hwnd = CreateWindowEx(0, wc.lpszClassName, NULL, 0, 0, 0, 0, 0, NULL, NULL, hInstance, NULL);
