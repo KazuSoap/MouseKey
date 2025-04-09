@@ -3,7 +3,11 @@
  * henkan => middle click
  *
  * ## build command ##
+ * VC
  * > cl.exe /O2 /GS- /source-charset:utf-8 MouseKey.c kernel32.lib user32.lib /link /NODEFAULTLIB /STACK:4096
+ *
+ * GCC
+ * $ gcc -O2 -Wl,--stack,4096 -o MouseKey MouseKey.c -mwindows -nostdlib -lkernel32 -luser32
  *
  * ## add startup this app ##
  * Location of the User Startup folder in Windows 10
@@ -33,6 +37,13 @@ void  send_key_input(WORD vkCode, WORD modifiers, DWORD dwFlags, DWORD time, DWO
 void  set_key_input(INPUT* input, WORD vkCode, DWORD dwFlags, DWORD time, ULONG_PTR dwExtraInfo);
 void  restore_temporary_keys();
 void  send_mouse_input(DWORD dwFlags, DWORD time, LONG dx, LONG dy, DWORD mouseData);
+
+// Virtual-key-code to be assigned
+// https://learn.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
+// ex.
+//      henkan key: VK_CONVERT
+// Scroll lock key: VK_SCROLL
+const DWORD vk_target = VK_SCROLL;
 
 HWND  hwnd = NULL;
 HHOOK hLowLevelKeyboardProc = NULL;
@@ -209,9 +220,9 @@ BOOL keydown(DWORD vkCode, DWORD dwFlags, DWORD time, DWORD dwExtraInfo) {
     WORD modifiers = update_modifiers();
 
     if (modifiers == MKEY_NONE) {
-        if (vkCode == VK_CONVERT) {
-            if (!REPLACED_KEY[VK_CONVERT]) {
-                REPLACED_KEY[VK_CONVERT] = VK_MBUTTON;
+        if (vkCode == vk_target) {
+            if (!REPLACED_KEY[vk_target]) {
+                REPLACED_KEY[vk_target] = VK_MBUTTON;
                 send_mouse_input(MOUSEEVENTF_MIDDLEDOWN, time, 0, 0, 0);
             }
         } else {
